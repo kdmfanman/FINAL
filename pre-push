@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#Start of Kyle's code. Creates diff.txt file 
+#I need Lou to verify this is in the right place
+
+lpdef=$(ls -a | grep .lastpush.txt | wc -l) #contains number of lastpush occurs
+if [ "$lpdef" -ne 1 ]
+then
+	(echo "master" > .lastpush.txt) > /dev/null #lastpush.txt doesn't exist. Create file and insert "master"
+fi
+branch="$(cat .lastpush.txt)"
+commit="$(git rev-parse origin/$branch)"
+(git diff $commit^ $commit | tee diff.txt) &> /dev/null #usr/local/bin/lintroller_files
+
+#saves current branch to lastpush.txt for next round of push
+awk -F/ '{print $NF}' .git/HEAD | tee .lastpush.txt #save last thing after /
+
+#End of Kyle's code
+
+GIT_DIR="$(git rev-parse --git-dir)"
+basename=${GIT_DIR%%.*}
+./lintroller $basename
+
+errorPresent=$?
+
+	if [ $errorPresent -ne 0 ]
+	 then
+		/bin/echo -e "\e[1;31m Failed lintroller test.\e[0m"
+		exit 1
+	else 
+		 /bin/echo -e "\e[1;32m Passed lintroller test.\e[0m"
+		exit 0
+	fi            
+
+~              
