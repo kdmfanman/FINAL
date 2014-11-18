@@ -1,3 +1,3 @@
 System
-System
+system
 strcpy
